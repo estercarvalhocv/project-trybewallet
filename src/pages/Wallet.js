@@ -1,26 +1,67 @@
 import React from 'react';
 import propTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { sendCoin } from '../actions';
+import { manageCoin, sendCoin } from '../actions';
 
 class Wallet extends React.Component {
+  state ={
+    id: 0,
+    value: '',
+    description: '',
+    currency: 'USD',
+    method: '',
+    tag: '',
+  }
+
   componentDidMount() {
     const { propCoin } = this.props;
     propCoin();
   }
 
+  handleChange = ({ target }) => {
+    const { name, value } = target;
+    this.setState({ [name]: value });
+  };
+
+  logClick = () => {
+    const { addExpenses } = this.props;
+    addExpenses({ ...this.state });
+    this.setState((prevState) => ({
+      id: prevState.id + 1,
+      value: '',
+    }));
+  }
+
+  refreshHeader = () => {
+    const { expense } = this.props;
+    const getValue = expense.reduce((acc, currentValue) => (
+      acc + (currentValue.value * currentValue.exchangeRates[currentValue.currency].ask)
+    ), 0);
+    return Number(getValue).toFixed(2);
+  }
+
   render() {
-    const { user, currency } = this.props;
+    const { user, currencys } = this.props;
+    const {
+      value,
+      description,
+      currency,
+      method,
+      tag,
+    } = this.state;
+
     return (
-      <body>
+      <div>
+
         <header>
           <h3 data-testid="email-field">
             Email:
             {user}
           </h3>
-          <h3 data-testid="total-field">R$ 0,00</h3>
-          <h3 data-testid="header-currency-field">BRL</h3>
+          <h3 data-testid="total-field">{this.refreshHeader()}</h3>
+          <h3 data-testid="header-currencys-field">BRL</h3>
         </header>
+
         <form>
           <label htmlFor="value">
             Valor
@@ -29,49 +70,61 @@ class Wallet extends React.Component {
               type="value"
               name="value"
               placeholder="digite o valor"
-              // value={ value }
-              // onChange={ this.handleChange }
+              value={ value }
+              onChange={ this.handleChange }
             />
           </label>
+
           <label htmlFor="coin">
             Moeda
-            <select id="coin">
-              {currency.map((coin, index) => (
+            <select
+              id="coin"
+              name="currency"
+              value={ currency }
+              onChange={ this.handleChange }
+            >
+              {currencys.map((coin, index) => (
                 <option
                   key={ index }
                   id="coin"
-                  value={ coin }
                 >
                   { coin }
                 </option>))}
             </select>
           </label>
-          <label htmlFor="method-input">
+
+          <label htmlFor="method">
             Método de pagamento
-            <select data-testid="method-input">
-              <option id="" type="text" name="" value="">Escolha um método</option>
-              <option id="money" type="text" name="money" value="money">Dinheiro</option>
-              <option id="credit-card" type="text" name="credit-card" value="credit-card">
-                Cartão de crédito
-              </option>
-              <option id="debit-card" type="text" name="debit-card" value="debit-card">
-                Cartão de débito
-              </option>
+            <select
+              data-testid="method-input"
+              id="method"
+              name="method"
+              value={ method }
+              onChange={ this.handleChange }
+            >
+              <option id="money" type="text">Dinheiro</option>
+              <option id="credit-card" type="text">Cartão de crédito</option>
+              <option id="debit-card" type="text">Cartão de débito</option>
             </select>
           </label>
-          <label htmlFor="tag-input">
+
+          <label htmlFor="tag">
             Categoria
-            <select data-testid="tag-input">
-              <option id="" type="text" name="" value="">Escolha uma categoria</option>
-              <option id="food" type="text" name="food" value="food">Alimentação</option>
-              <option id="lounge" type="text" name="lounge" value="lounge">Lazer</option>
-              <option id="job" type="text" name="job" value="job">Trabalho </option>
-              <option id="transport" type="text" name="transport" value="transport">
-                Transporte
-              </option>
-              <option id="health" type="text" name="health" value="health">Saúde</option>
+            <select
+              data-testid="tag-input"
+              name="tag"
+              id="tag"
+              value={ tag }
+              onChange={ this.handleChange }
+            >
+              <option id="food" type="text">Alimentação</option>
+              <option id="lounge" type="text">Lazer</option>
+              <option id="job" type="text">Trabalho </option>
+              <option id="transport" type="text">Transporte</option>
+              <option id="health" type="text">Saúde</option>
             </select>
           </label>
+
           <label htmlFor="description">
             Descrição
             <input
@@ -79,36 +132,59 @@ class Wallet extends React.Component {
               type="description"
               name="description"
               placeholder="descreva seu gasto"
-              // value={ description }
-              // onChange={ this.handleChange }
+              value={ description }
+              onChange={ this.handleChange }
             />
           </label>
+
           <button
             type="button"
             name="btn-expense"
-            // onClick={ this.logClick }
+            onClick={ this.logClick }
           >
             Adicionar despesa
           </button>
         </form>
-      </body>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Descrição</th>
+              <th>Tag</th>
+              <th>Método de pagamento</th>
+              <th>Valor</th>
+              <th>Moeda</th>
+              <th>Câmbio utilizado</th>
+              <th>Valor convertido</th>
+              <th>Moeda de conversão</th>
+              <th>Editar/Excluir</th>
+            </tr>
+          </thead>
+          <tbody />
+        </table>
+
+      </div>
     );
   }
 }
 
 const mapStateToProps = (state) => ({
   user: state.user.email,
-  currency: state.wallet.currencies,
+  currencys: state.wallet.currencies,
+  expense: state.wallet.expenses,
 });
 
 const mapDispatchToProps = (dispatch) => ({
   propCoin: () => dispatch(sendCoin()),
+  addExpenses: (expenses) => dispatch(manageCoin(expenses)),
 });
 
 Wallet.propTypes = {
   user: propTypes.string.isRequired,
-  currency: propTypes.string.isRequired,
+  currencys: propTypes.arrayOf(Object).isRequired,
+  expense: propTypes.arrayOf(propTypes.shape({})).isRequired,
   propCoin: propTypes.func.isRequired,
+  addExpenses: propTypes.func.isRequired,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Wallet);

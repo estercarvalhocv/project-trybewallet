@@ -5,16 +5,23 @@ const INITIAL_STATE = {
   editor: false, // valor booleano que indica de uma despesa está sendo editada
   idToEdit: 0, // valor numérico que armazena o id da despesa que esta sendo editada
 };
-const reducerWallet = (state = INITIAL_STATE, action) => {
-  switch (action.type) {
+function wallet(state = INITIAL_STATE, { type, payload }) {
+  switch (type) {
   case 'SAVE_CURRENCIES':
     return {
       ...state,
-      currencies: action.payload,
+      currencies: payload,
     };
+  case 'SAVE_EXPENSES':
+    return {
+      ...state,
+      expenses: [...state.expenses, payload],
+    };
+    /*
+    editor: { ...state },
+    idToEdit: { ...state }, */
   default:
     return state;
   }
-};
-
-export default reducerWallet;
+}
+export default wallet;
