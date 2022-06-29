@@ -59,7 +59,7 @@ class Wallet extends React.Component {
             {user}
           </h3>
           <h3 data-testid="total-field">{this.refreshHeader()}</h3>
-          <h3 data-testid="header-currencys-field">BRL</h3>
+          <h3 data-testid="header-currency-field">BRL</h3>
         </header>
 
         <form>
