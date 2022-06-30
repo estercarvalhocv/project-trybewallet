@@ -4,14 +4,14 @@ import { connect } from 'react-redux';
 import { manageCoin, sendCoin } from '../actions';
 
 class Wallet extends React.Component {
-  state ={
+  state = {
     id: 0,
     value: '',
     description: '',
     currency: 'USD',
     method: '',
     tag: '',
-  }
+  };
 
   componentDidMount() {
     const { propCoin } = this.props;
@@ -30,29 +30,25 @@ class Wallet extends React.Component {
       id: prevState.id + 1,
       value: '',
     }));
-  }
+  };
 
   refreshHeader = () => {
     const { expense } = this.props;
-    const getValue = expense.reduce((acc, currentValue) => (
-      acc + (currentValue.value * currentValue.exchangeRates[currentValue.currency].ask)
-    ), 0);
+    const getValue = expense.reduce(
+      (acc, currentValue) => acc
+        + currentValue.value
+        * currentValue.exchangeRates[currentValue.currency].ask,
+      0,
+    );
     return Number(getValue).toFixed(2);
-  }
+  };
 
   render() {
-    const { user, currencys } = this.props;
-    const {
-      value,
-      description,
-      currency,
-      method,
-      tag,
-    } = this.state;
+    const { user, currencys, expense } = this.props;
+    const { value, description, currency, method, tag } = this.state;
 
     return (
       <div>
-
         <header>
           <h3 data-testid="email-field">
             Email:
@@ -84,12 +80,10 @@ class Wallet extends React.Component {
               onChange={ this.handleChange }
             >
               {currencys.map((coin, index) => (
-                <option
-                  key={ index }
-                  id="coin"
-                >
-                  { coin }
-                </option>))}
+                <option key={ index } id="coin">
+                  {coin}
+                </option>
+              ))}
             </select>
           </label>
 
@@ -102,9 +96,15 @@ class Wallet extends React.Component {
               value={ method }
               onChange={ this.handleChange }
             >
-              <option id="money" type="text">Dinheiro</option>
-              <option id="credit-card" type="text">Cartão de crédito</option>
-              <option id="debit-card" type="text">Cartão de débito</option>
+              <option id="money" type="text">
+                Dinheiro
+              </option>
+              <option id="credit-card" type="text">
+                Cartão de crédito
+              </option>
+              <option id="debit-card" type="text">
+                Cartão de débito
+              </option>
             </select>
           </label>
 
@@ -117,11 +117,22 @@ class Wallet extends React.Component {
               value={ tag }
               onChange={ this.handleChange }
             >
-              <option id="food" type="text">Alimentação</option>
-              <option id="lounge" type="text">Lazer</option>
-              <option id="job" type="text">Trabalho </option>
-              <option id="transport" type="text">Transporte</option>
-              <option id="health" type="text">Saúde</option>
+              <option id="food" type="text">
+                Alimentação
+              </option>
+              <option id="lounge" type="text">
+                Lazer
+              </option>
+              <option id="job" type="text">
+                Trabalho
+                {' '}
+              </option>
+              <option id="transport" type="text">
+                Transporte
+              </option>
+              <option id="health" type="text">
+                Saúde
+              </option>
             </select>
           </label>
 
@@ -137,11 +148,7 @@ class Wallet extends React.Component {
             />
           </label>
 
-          <button
-            type="button"
-            name="btn-expense"
-            onClick={ this.logClick }
-          >
+          <button type="button" name="btn-expense" onClick={ this.logClick }>
             Adicionar despesa
           </button>
         </form>
@@ -160,9 +167,35 @@ class Wallet extends React.Component {
               <th>Editar/Excluir</th>
             </tr>
           </thead>
-          <tbody />
+          <tbody>
+            {expense.map((exp) => (
+              <tr key={ exp.id }>
+                <td>{exp.description}</td>
+                <td>{exp.tag}</td>
+                <td>{exp.method}</td>
+                <td>{Number(exp.value).toFixed(2)}</td>
+                <td>{exp.exchangeRates[exp.currency].name}</td>
+                <td>
+                  {Number(exp.exchangeRates[exp.currency].ask).toFixed(2)}
+                </td>
+                <td>
+                  {Number(
+                    exp.value * exp.exchangeRates[exp.currency].ask,
+                  ).toFixed(2)}
+                </td>
+                <td>Real</td>
+                <td>
+                  <button type="button" data-testid="delete-btn">
+                    Deletar
+                  </button>
+                  <button type="button" data-testid="edit-btn">
+                    Editar
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
         </table>
-
       </div>
     );
   }
