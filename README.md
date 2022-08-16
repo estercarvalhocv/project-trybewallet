@@ -1,4 +1,4 @@
-# 💳 Project Pixels Art Trybe 💳
+# 💳 Project Trybewallet Trybe 💳
 ## 🇧🇷 PT-BR
 Olá pessoa, tudo bem ?  
 Aqui você encontra uma serie de códigos feitos por mim para o projeto Trybewallet criado durante meu curso na Trybe.  
